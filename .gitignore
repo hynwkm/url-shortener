@@ -1,0 +1,217 @@
+
+# ==================================================
+# 1. SECRETS & CREDENTIALS
+# ==================================================
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Credentials and secret files
+secrets/
+secret/
+credentials/
+*.secret
+*.secrets
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+*.cer
+*.ppk
+
+# AWS credentials
+.aws/
+**/credentials
+**/config
+
+# SSH private keys
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.pub.tmp
+
+# Generic credentials
+*password*
+*passwd*
+*credential*
+*credentials*
+*secret*
+!*.example
+!*.sample
+
+# ==================================================
+# 2. TERRAFORM
+# ==================================================
+
+# Terraform working directory
+**/.terraform/*
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform variable files
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform CLI configuration
+.terraformrc
+terraform.rc
+
+# Terraform plans
+*.tfplan
+*.plan
+
+# ==================================================
+# 3. DOCKER
+# ==================================================
+
+# Docker local data
+.docker/
+docker-data/
+docker-volumes/
+volumes/
+
+# Local database persistence
+**/mariadb/data/
+**/mysql/data/
+**/postgres/data/
+
+# Docker logs
+*-json.log
+
+# ==================================================
+# 4. DATABASE
+# ==================================================
+
+# Database backups and dumps
+*.sql.gz
+*.dump
+*.bak
+*.backup
+*.db
+*.sqlite
+*.sqlite3
+
+# Local database files
+ibdata*
+ib_logfile*
+aria_log*
+*.ibd
+
+# ==================================================
+# 5. JAVA / TOMCAT / MAVEN / GRADLE
+# ==================================================
+
+# Java compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Build directories
+target/
+build/
+out/
+
+# Gradle
+.gradle/
+
+# Tomcat runtime files
+logs/
+temp/
+work/
+webapps/
+
+# ==================================================
+# 6. LOGS & TEMPORARY FILES
+# ==================================================
+
+*.log
+*.log.*
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.old
+*.orig
+*.cache
+
+# ==================================================
+# 7. IDE / EDITOR
+# ==================================================
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# ==================================================
+# 8. OPERATING SYSTEM
+# ==================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.nfs*
+
+# ==================================================
+# 9. NODE.JS (IF USED)
+# ==================================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ==================================================
+# 10. LOCAL CONFIGURATION
+# ==================================================
+
+# Local-only configuration
+*.local
+config.local.*
+application-local.*
+
+# Tailscale local state
+tailscale.state
+tailscaled.state
+
