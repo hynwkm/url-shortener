@@ -74,6 +74,14 @@ git config --global user.name "본인 이름"
 git config --global user.email "GitHub 이메일"
 ```
 
+### 최초 Push 자동 설정
+
+새 브랜치를 처음 GitHub에 업로드할 때 별도의 옵션을 입력하지 않도록 설정합니다.
+
+```bash
+git config --global push.autoSetupRemote true
+```
+
 ## 5. 팀 프로젝트 내려받기 (Clone)
 
 Clone은 GitHub에 있는 팀 프로젝트를 내 PC로 내려받는 작업입니다.
