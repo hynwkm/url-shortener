@@ -63,7 +63,7 @@
 	sudo systemctl enable --now apache2
 
 
-5. http://www.shorturl.store 혹은 EC2 IP로 접속해서 apache 설치 확인
+5. http://www.~~~.store 혹은 EC2 IP로 접속해서 apache 설치 확인
 
 
 6. https 인증서 발급
