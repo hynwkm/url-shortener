@@ -1,0 +1,11 @@
+<VirtualHost *:443>
+    ServerName www.orhpeia.store
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/www.orhpeia.store/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/www.orhpeia.store/privkey.pem
+    ProxyRequests Off
+    ProxyPreserveHost On
+    RequestHeader set X-Forwarded-Proto "https"
+    ProxyPass / http://TOMCAT_TS_IP:8080/
+    ProxyPassReverse / http://TOMCAT_TS_IP:8080/
+</VirtualHost>
