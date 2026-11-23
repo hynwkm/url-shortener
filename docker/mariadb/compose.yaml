@@ -1,0 +1,24 @@
+services:
+    db:
+        image: mariadb
+        restart: always
+        environment:
+            MARIADB_DATABASE: ${DB_NAME}
+            MARIADB_PASSWORD_FILE: /run/secrets/mariadb_app_password
+            MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_password
+            MARIADB_USER: ${DB_USER}
+        secrets:
+            - mariadb_app_password
+            - mariadb_root_password
+        volumes:
+            - db-data:/var/lib/mysql
+            - ../../app/mariadb:/docker-entrypoint-initdb.d:ro
+# 마이그레이션 서비스 추가 필요
+volumes:
+    db-data:
+
+secrets:
+    mariadb_root_password:
+        file: ../../secrets/mariadb_root_password.txt
+    mariadb_app_password:
+        file: ../../secrets/mariadb_app_password.txt
