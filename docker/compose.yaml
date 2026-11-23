@@ -4,21 +4,22 @@ services:
   was:
     build:
       context: ./Tomcat
-      dockerfile: dockerfile
-    image: tomcatwas
+      dockerfile: Dockerfile
+    image: tomcat
     restart: always #unless-stopped
 
-    depends_on: 
+    depends_on: #DB시작순서 관리
       - db
     
     ports:
-      - "8080:8080"  # ec2의 아이피 지정해서 연결?
-    
+      - "8080:8080"
+      # tailscale EC2 IP 지정해서 연결?
+
     environment:
       #시간대설정- 동기화
       TZ: Asia/Seoul
       #mariaDB 연결 정보
-      DB_HOST: ${DB_HOST}
+      DB_HOST: db
       DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
@@ -28,9 +29,15 @@ services:
     secrets:
       #mariaDB 연결 패스워드
       - mariadb_app_password
+
     networks:
       - #was와 DB를 연결할 도커 네트워크
 
-
-
+    healthcheck: #was 컨테이너에 문제가 없는 지 체크, 15초마다 검사, 응답대기 5초, 5회 연속실패시 언헬시,초기 20초간 구동 유예
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/ > /dev/null || exit 1"]
+      # 헬스체크에 사용할 명령어
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s 
 
