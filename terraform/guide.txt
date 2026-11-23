@@ -16,7 +16,7 @@
 3. AWS 관리 콘솔 웹에서 IAM 사용자 CLI access 키 발급
 
 
-4. *.csv 다운로드
+4. access_key.csv 다운로드
 
 
 5. 윈도우에서 aws cli 로그인
