@@ -16,5 +16,5 @@ terraform {
 # AWS 리소스를 생성할 기본 환경을 설정합니다.
 provider "aws" {
   # 서울 리전에서 리소스를 생성합니다.
-  region = "ap-northeast-2"
+  region = var.region_name
 }
