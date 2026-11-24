@@ -19,3 +19,8 @@ variable "zone_id" {
 variable "fqdn" {
   type = string
 }
+
+# 리전 이름을 입력받습니다.
+variable "region" {
+  type = string
+}
