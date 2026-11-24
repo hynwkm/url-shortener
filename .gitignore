@@ -42,7 +42,6 @@ id_ed25519
 *passwd*
 *credential*
 *credentials*
-*secret*
 !*.example
 !*.sample
 
