@@ -21,6 +21,6 @@ variable "fqdn" {
 }
 
 # 리전 이름을 입력받습니다.
-variable "region" {
+variable "region_name" {
   type = string
 }
