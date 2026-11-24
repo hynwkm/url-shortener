@@ -1,0 +1,134 @@
+실행 가이드 (한글 설명 추가본)
+※ # 설명으로 시작하는 문장은 명령어가 아닙니다.
+※ 모든 .tf 파일과 terraform.tfvars를 같은 폴더에 두세요.
+※ 기존 키 페어, 호스팅 영역, 도메인은 직접 준비해야 합니다.
+※ Terraform은 EC2까지만 구성하며 Apache, HTTPS, Tailscale은 아래 절차대로 별도 설정합니다.
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+* 테라폼 빌드 가이드
+
+
+
+1. 윈도우에 테라폼 설치하기
+	winget install --exact --id Hashicorp.Terraform
+
+
+2. 윈도우에 aws cli 설치하기
+	winget install --exact --id Amazon.AWSCLI
+
+
+3. AWS 관리 콘솔 웹에서 IAM 사용자 CLI access 키 발급
+
+
+4. access_key.csv 다운로드
+
+
+5. 윈도우에서 aws cli 로그인
+	# 설명: 액세스 키, 시크릿 키, 기본 리전 등을 설정합니다. 키는 외부에 공유하지 마세요.
+	aws configure
+
+
+6. terraform.tfvars 에서 변수 설정
+	key_name = EC2 -> 네트워크 및 보안 -> 키 페어 -> 키 이름 입력
+	admin_cidr = SSH 접속 PC의 공인 ip 주소 /32 입력
+	zone_id = Route 53 -> 호스팅 영역 -> 호스팅 영역 ID 입력
+	fqdn = 도메인 주소 입력 (www.~~~.store)
+
+
+7. 테라폼 생성
+	# 설명: 공급자 플러그인을 다운로드하고 작업 폴더를 초기화합니다.
+	terraform init
+	# 설명: Terraform 구성의 문법 및 내부 참조를 검사합니다.
+	terraform validate
+	terraform plan '-out=web.tfplan'	배포 내용을 web.tfplan으로 저장
+	terraform apply "web.tfplan"		배포 진행
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+* Powershell에서 SSH로 EC2 접속하기
+
+
+
+1. EC2 ip를 변수로 저장
+	$webip = terraform output -raw web_ip
+	
+
+2. EC2 키 파일(.pem) 위치를 변수로 저장
+	$keyfile = "C:\~~~\test.pem"
+
+
+3. SSH 접속
+	ssh -i "$keyfile" "ubuntu@$webip"
+
+
+4. Apache 설치
+	sudo apt update
+	sudo apt install -y apache2
+	# 설명: Apache를 즉시 시작하고 재부팅 시 자동 시작하도록 설정합니다.
+	sudo systemctl enable --now apache2
+
+
+5. http://www.~~~.store 혹은 EC2 IP로 접속해서 apache 설치 확인
+
+
+6. https 인증서 발급
+	sudo apt install -y certbot
+	# 설명: 웹루트 방식으로 도메인 소유권을 검증해 인증서를 발급합니다.
+	sudo certbot certonly --webroot -w /var/www/html -d www.~~~.store
+
+
+7. Apache에 https 연결
+	sudo apt install -y certbot python3-certbot-apache
+	# 설명: Apache에 인증서를 연결하고 HTTP를 HTTPS로 전환합니다.
+	sudo certbot --apache -d www.~~~.store --redirect
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+* Tailscale 연결 (예정)
+
+
+
+1. EC2 에서 연결 실행
+	# 설명: Tailscale 설치 스크립트를 다운로드합니다. 실행 전 출처를 확인하세요.
+	curl -fsSLo /tmp/tailscale-install.sh https://tailscale.com/install.sh
+	sudo sh /tmp/tailscale-install.sh
+	sudo tailscale up
+
+
+2. 표시된 인증 URL에 접속해서 네트워크 등록
+
+
+3. 온프레미스 연결
+	(온프레미스 VM에서 실행) tailscale ip -4
+
+	# 설명: 온프레미스 VM의 Tailscale IP를 입력받아 변수에 저장합니다. EC2의 Bash에서 실행합니다.
+	read -rp "온프레미스 VM의 Tailscale IPv4: " TOMCAT_TS_IP
+	tailscale status
+	curl -i --connect-timeout 5 "http://${TOMCAT_TS_IP}:8080/"
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+* 배포한 Terraform 제거하기
+
+
+
+1. Powershell에서 project 폴더로 이동
+
+
+2. 테라폼 제거
+	# 설명: Terraform이 관리하는 AWS 리소스를 삭제합니다. 삭제 목록을 확인한 후 승인하세요.
+	terraform destroy
+
+
+--------------------------------------------------------------------------------------------------------------------

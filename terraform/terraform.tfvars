@@ -1,0 +1,10 @@
+# 사용자 환경에 맞게 수정해야 하는 입력값
+
+# 서울 리전에서 미리 생성한 키 페어 이름으로 변경하세요.
+key_name   = "YOUR_SEOUL_KEY_NAME"
+# SSH 접속 PC의 실제 공인 IPv4/32로 변경하세요. /32는 IP 하나만 허용합니다.
+admin_cidr = "YOUR_PUBLIC_IPV4/32"
+# 기존 Route 53 퍼블릭 호스팅 영역 ID로 변경하세요.
+zone_id    = "YOUR_PUBLIC_HOSTED_ZONE_ID"
+# 소유하고 DNS 위임이 완료된 실제 도메인 이름으로 변경하세요.
+fqdn       = "www.~~~.store"
