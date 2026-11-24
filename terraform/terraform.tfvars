@@ -8,3 +8,5 @@ admin_cidr = "YOUR_PUBLIC_IPV4/32"
 zone_id    = "YOUR_PUBLIC_HOSTED_ZONE_ID"
 # 소유하고 DNS 위임이 완료된 실제 도메인 이름으로 변경하세요.
 fqdn       = "www.~~~.store"
+# 리전 이름 입력하세요.
+region_name = "ap_~~~"
