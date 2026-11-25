@@ -10,3 +10,5 @@ zone_id    = "YOUR_PUBLIC_HOSTED_ZONE_ID"
 fqdn       = "www.~~~.store"
 # 리전 이름 입력하세요.
 region_name = "ap_~~~"
+# TailScale 키값 입력.
+tailscale_auth_key= ""
