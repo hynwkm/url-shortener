@@ -1,5 +1,6 @@
 services:
     db:
+        container_name: url-shortener-db
         image: mariadb
         restart: always
         networks:
