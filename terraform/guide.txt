@@ -64,6 +64,7 @@
 
 3. SSH 접속
 	ssh -i "$keyfile" "ubuntu@$webip"
+    (빨간달팽이 쓰세여)
 
 
 4. Apache 설치
