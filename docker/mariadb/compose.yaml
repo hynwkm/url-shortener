@@ -3,7 +3,7 @@ services:
         image: mariadb
         restart: always
         networks:
-            - test
+            - shorturl-network
         environment:
             MARIADB_DATABASE: ${DB_NAME}
             MARIADB_PASSWORD_FILE: /run/secrets/mariadb_app_password
@@ -26,5 +26,5 @@ secrets:
         file: ../../secrets/mariadb_app_password.txt
 
 networks:
-    test:
+    shorturl-network:
         external: true
