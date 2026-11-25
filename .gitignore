@@ -123,7 +123,6 @@ aria_log*
 # Java compiled files
 *.class
 *.jar
-*.war
 *.ear
 
 # Build directories
