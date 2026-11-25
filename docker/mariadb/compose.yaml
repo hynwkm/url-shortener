@@ -16,6 +16,12 @@ services:
         volumes:
             - db-data:/var/lib/mysql
             - ../../app/mariadb:/docker-entrypoint-initdb.d:ro
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            interval: 5s
+            timeout: 3s
+            retries: 10
+            start_period: 10s
 # 마이그레이션 서비스 추가 필요
 volumes:
     db-data:
