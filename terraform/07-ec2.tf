@@ -1,15 +1,3 @@
-variable "tailscale_auth_key" {
-  description = "Tailscale auth key including the tskey-auth- prefix."
-  type        = string
-  sensitive   = true
-  nullable    = false
-
-  validation {
-    condition     = can(regex("^tskey-auth-[A-Za-z0-9_-]+$", var.tailscale_auth_key))
-    error_message = "tailscale_auth_key must be a complete tskey-auth- key without whitespace."
-  }
-}
-
 resource "aws_instance" "web" {
   ami                         = data.aws_ssm_parameter.ubuntu.value
   instance_type               = "t3.micro"
