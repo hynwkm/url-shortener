@@ -1,3 +1,15 @@
+variable "tailscale_auth_key" {
+  description = "Tailscale auth key including the tskey-auth- prefix."
+  type        = string
+  sensitive   = true
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^tskey-auth-[A-Za-z0-9_-]+$", var.tailscale_auth_key))
+    error_message = "tailscale_auth_key must be a complete tskey-auth- key without whitespace."
+  }
+}
+
 resource "aws_instance" "web" {
   ami                         = data.aws_ssm_parameter.ubuntu.value
   instance_type               = "t3.micro"
@@ -11,9 +23,9 @@ resource "aws_instance" "web" {
     aws_vpc_security_group_egress_rule.out
   ]
 
-  # 초기 부팅 시 Apache 및 HTTPS 자동 설정
+  # 초기 부팅 시 Tailscale, Apache 및 HTTPS 자동 설정
   user_data_replace_on_change = true
-  user_data = <<-EOF_SCRIPT
+  user_data                   = <<-EOF_SCRIPT
     #!/bin/bash
     set -euo pipefail
     export DEBIAN_FRONTEND=noninteractive
@@ -28,6 +40,36 @@ resource "aws_instance" "web" {
       sleep 15
     done
     test "$installed" = 1
+
+    # Tailscale 설치: HTTPS 인증서 발급 전에 원격 접속을 준비합니다.
+    tailscale_installed=0
+    for i in {1..10}; do
+      if curl -fsSL --connect-timeout 10 --max-time 120 \
+        https://tailscale.com/install.sh -o /tmp/install-tailscale.sh \
+        && sh /tmp/install-tailscale.sh; then
+        tailscale_installed=1
+        break
+      fi
+      sleep 15
+    done
+    rm -f /tmp/install-tailscale.sh
+    test "$tailscale_installed" = 1
+    systemctl enable --now tailscaled
+
+    # 키를 로그에 출력하지 않습니다. 키는 state/user data에는 포함됩니다.
+    set +x
+    TAILSCALE_AUTH_KEY='${var.tailscale_auth_key}'
+    tailscale_connected=0
+    for i in {1..10}; do
+      if tailscale up --auth-key="$TAILSCALE_AUTH_KEY" --timeout=30s; then
+        tailscale_connected=1
+        break
+      fi
+      sleep 15
+    done
+    unset TAILSCALE_AUTH_KEY
+    test "$tailscale_connected" = 1
+    echo 'Tailscale setup complete'
 
     # Apache 가상 호스트 설정
     cat > /etc/apache2/sites-available/shorturl.conf <<VHOST
@@ -75,3 +117,4 @@ resource "aws_instance" "web" {
 
   tags = { Name = "shorturl-apache" }
 }
+

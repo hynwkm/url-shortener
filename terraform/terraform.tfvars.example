@@ -11,4 +11,4 @@ fqdn       = "www.~~~.store"
 # 리전 이름 입력하세요.
 region_name = "ap_~~~"
 # TailScale 키값 입력.
-tailscale_auth_key= ""
+tailscale_auth_key= "tskey-auth-실제인증키"
