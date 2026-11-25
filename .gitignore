@@ -139,7 +139,6 @@ out/
 logs/
 temp/
 work/
-webapps/
 
 # ==================================================
 # 6. LOGS & TEMPORARY FILES
