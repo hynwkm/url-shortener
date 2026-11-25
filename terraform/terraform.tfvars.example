@@ -1,0 +1,5 @@
+key_name   =
+admin_cidr =
+zone_id    =
+fqdn       =
+tailscale_auth_key =
