@@ -2,6 +2,8 @@ services:
     db:
         image: mariadb
         restart: always
+        networks:
+            - test
         environment:
             MARIADB_DATABASE: ${DB_NAME}
             MARIADB_PASSWORD_FILE: /run/secrets/mariadb_app_password
@@ -22,3 +24,7 @@ secrets:
         file: ../../secrets/mariadb_root_password.txt
     mariadb_app_password:
         file: ../../secrets/mariadb_app_password.txt
+
+networks:
+    test:
+        external: true
