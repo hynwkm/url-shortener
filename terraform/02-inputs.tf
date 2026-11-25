@@ -24,3 +24,10 @@ variable "fqdn" {
 variable "region_name" {
   type = string
 }
+
+# TailScale 키값 입력.
+variable "tailscale_auth_key" {
+  description = "Tailscale authentication key"
+  type        = string
+  sensitive   = true
+}
