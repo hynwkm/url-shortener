@@ -9,7 +9,7 @@ zone_id    = "YOUR_PUBLIC_HOSTED_ZONE_ID"
 # 소유하고 DNS 위임이 완료된 실제 도메인 이름으로 변경하세요.
 fqdn       = "www.~~~.store"
 # tailscale status에서 Tomcat 서버를 식별할 장치 이름
-tomcat_tailscale_name = "minip"
+tomcat_tailscale_name = ""
 # 리전 이름 입력하세요.
 region_name = "ap-northeast-2"
 # TailScale 키값 입력.
