@@ -18,10 +18,11 @@ resource "aws_instance" "web" {
     set -euo pipefail
     export DEBIAN_FRONTEND=noninteractive
     DOMAIN=${jsonencode(trimsuffix(var.fqdn, "."))}
+    TOMCAT_NAME=${jsonencode(lower(trimsuffix(var.tomcat_tailscale_name, ".")))}
     # EIP 연결 및 인터넷 통신이 가능해질 때까지 재시도
     installed=0
     for i in {1..30}; do
-      if apt-get update -o APT::Update::Error-Mode=any && apt-get install -y apache2 certbot python3-certbot-apache dnsutils curl; then
+      if apt-get update -o APT::Update::Error-Mode=any && apt-get install -y apache2 certbot python3-certbot-apache dnsutils curl jq; then
         installed=1
         break
       fi
@@ -59,6 +60,31 @@ resource "aws_instance" "web" {
     test "$tailscale_connected" = 1
     echo 'Tailscale setup complete'
 
+    # 장치 목록 동기화를 기다리고, 이름이 일치하는 단일 장치의 IPv4를 선택합니다.
+    TOMCAT_IP=""
+    for i in {1..30}; do
+      if TOMCAT_IP=$(tailscale status --json | jq -er --arg name "$TOMCAT_NAME" '
+        [(.Peer // {})[] | select(
+          ((.HostName // "" | ascii_downcase) == $name) or
+          ((.DNSName // "" | ascii_downcase | rtrimstr(".")) == $name) or
+          ((.DNSName // "" | ascii_downcase | split(".")[0]) == $name)
+        )] |
+        if length == 1 then
+          [.[0].TailscaleIPs[]? | select(test("^[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+$"))] |
+          if length == 1 then .[0] else error("Expected one IPv4 address") end
+        else error("Expected exactly one matching Tomcat peer") end
+      '); then
+        break
+      fi
+      TOMCAT_IP=""
+      sleep 10
+    done
+    if [ -z "$TOMCAT_IP" ]; then
+      echo "Cannot resolve a unique Tomcat Tailscale IPv4 for $TOMCAT_NAME" >&2
+      exit 1
+    fi
+    echo "Tomcat backend: $TOMCAT_NAME ($TOMCAT_IP):8080"
+
     # Apache 가상 호스트 설정
     cat > /etc/apache2/sites-available/shorturl.conf <<VHOST
     <VirtualHost *:80>
@@ -90,6 +116,27 @@ resource "aws_instance" "web" {
     systemctl enable --now certbot.timer
     apache2ctl configtest
     curl -fsS --max-time 15 --resolve "$DOMAIN:443:127.0.0.1" "https://$DOMAIN/" >/dev/null
+
+    # 인증서 발급 및 HTTPS 확인 후 Tomcat 리버스 프록시를 설정합니다.
+    a2enmod ssl proxy proxy_http headers
+    cat > /etc/apache2/sites-available/shorturl-le-ssl.conf <<VHOST
+    <IfModule mod_ssl.c>
+    <VirtualHost *:443>
+        ServerName $DOMAIN
+        SSLEngine on
+        SSLCertificateFile /etc/letsencrypt/live/$DOMAIN/fullchain.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/$DOMAIN/privkey.pem
+        ProxyRequests Off
+        ProxyPreserveHost On
+        RequestHeader set X-Forwarded-Proto "https"
+        ProxyPass / http://$TOMCAT_IP:8080/
+        ProxyPassReverse / http://$TOMCAT_IP:8080/
+    </VirtualHost>
+    </IfModule>
+    VHOST
+    a2ensite shorturl-le-ssl.conf
+    apache2ctl configtest
+    systemctl reload apache2
     echo 'HTTPS setup complete'
   EOF_SCRIPT
 
