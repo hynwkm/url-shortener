@@ -16,6 +16,13 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
+echo "===== 1.5. 호스트 이름 변경 ====="
+set -a
+source "$ENV_FILE"
+set +a
+
+sudo hostnamectl hostname "$TOMCAT_HOSTNAME"
+
 echo "===== 2. Docker 네트워크 확인 ====="
 
 if ! docker network inspect shorturl-network >/dev/null 2>&1; then
