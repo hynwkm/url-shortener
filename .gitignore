@@ -38,11 +38,9 @@ id_ed25519
 *.pub.tmp
 
 # Generic credentials
-*password*
 *passwd*
 *credential*
 *credentials*
-*secret*
 !*.example
 !*.sample
 
@@ -125,7 +123,6 @@ aria_log*
 # Java compiled files
 *.class
 *.jar
-*.war
 *.ear
 
 # Build directories
@@ -140,7 +137,6 @@ out/
 logs/
 temp/
 work/
-webapps/
 
 # ==================================================
 # 6. LOGS & TEMPORARY FILES

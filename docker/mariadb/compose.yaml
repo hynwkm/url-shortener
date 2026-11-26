@@ -1,24 +1,44 @@
 services:
+    # 온프레미스 MariaDB 데이터베이스 서비스
     db:
+        container_name: url-shortener-db
         image: mariadb
         restart: always
-        environment:
+        networks:
+            - shorturl-network # 기존 Docker 네트워크 연결 (docker network create shorturl-network)
+        # .env 파일을 통해 로컬 환경 변수 설정 필요
+        environment: 
             MARIADB_DATABASE: ${DB_NAME}
+            MARIADB_USER: ${DB_USER}
+            # 비밀번호는 환경 변수 대신 secrets 폴더로 관리
             MARIADB_PASSWORD_FILE: /run/secrets/mariadb_app_password
             MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_password
-            MARIADB_USER: ${DB_USER}
-        secrets:
+        # 컨테이너 내부에 비밀번호 파일을 마운트
+        secrets: 
             - mariadb_app_password
             - mariadb_root_password
         volumes:
-            - db-data:/var/lib/mysql
-            - ../../app/mariadb:/docker-entrypoint-initdb.d:ro
-# 마이그레이션 서비스 추가 필요
+            - db-data:/var/lib/mysql # DB 데이터 영구 저장
+            - ../../app/mariadb:/docker-entrypoint-initdb.d:ro # 최초 DB 초기화 시 실행할 SQL 스크립트 마운트 
+        # MariaDB 연결 및 InnoDB 초기화 완료 여부 확인
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            interval: 5s
+            timeout: 3s
+            retries: 10
+            start_period: 10s
+# 추후 DB 스키마 및 데이터 변경을 관리할 마이그레이션 서비스 추가 필요
+
 volumes:
     db-data:
 
+# /secrets 폴더에 비밀번호 파일 생성 필요
 secrets:
     mariadb_root_password:
         file: ../../secrets/mariadb_root_password.txt
     mariadb_app_password:
         file: ../../secrets/mariadb_app_password.txt
+
+networks:
+    shorturl-network:
+        external: true
