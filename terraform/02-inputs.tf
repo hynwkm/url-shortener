@@ -20,6 +20,16 @@ variable "fqdn" {
   type = string
 }
 
+variable "tomcat_tailscale_name" {
+  description = "Tomcat 장치의 Tailscale 이름 또는 전체 DNS 이름"
+  type        = string
+
+  validation {
+    condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9.-]*$", var.tomcat_tailscale_name))
+    error_message = "Tomcat 장치 이름 또는 Tailscale DNS 이름을 입력하세요."
+  }
+}
+
 # 리전 이름을 입력받습니다.
 variable "region_name" {
   type = string
