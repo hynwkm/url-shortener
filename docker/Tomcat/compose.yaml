@@ -1,21 +1,24 @@
 services:
   was:
-    image: tomcat:10.1-jdk17
+    image: tomcat:10.1-jdk17    #JAVA가 포함된 tomcat 이미지파일 사용
     container_name: url-shortener-was
     restart: always
+    #was-DB와 연결할 네트워크(docker network create shorturl-network)
     networks: 
       - shorturl-network
     ports:
-      - "${WAS_BIND_IP:-0.0.0.0}:8080:8080"
+      - "8080:8080"
+    #.env파일과 secret디렉토리 수정 및 생성 필요
     environment:
       DB_HOST: ${DB_HOST:-db}
       DB_PORT: ${DB_PORT:-3306}
       DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD_FILE: /run/secrets/mariadb_app_password
-      JAVA_OPTS: "-Xms256m -Xmx512m -Duser.timezone=Asia/Seoul"
+      DB_USER: ${DB_USER}         #DB 연결 정보
+      DB_PASSWORD_FILE: /run/secrets/mariadb_app_password 
+      JAVA_OPTS: "-Xms256m -Xmx512m -Duser.timezone=Asia/Seoul"     #tomcat 실행 시 사용하는 java의 메모리 크기 및 시간대 지정
     secrets:
       - mariadb_app_password
+    #.war 파일 컨테이너로 마운트
     volumes:
       - ../../app/tomcat/webapps:/usr/local/tomcat/webapps
     entrypoint: ["/bin/bash", "-c"]
@@ -29,6 +32,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+    #was 컨테이너에 문제가 없는 지 체크, 15초마다 검사, 응답대기 5초, 5회 연속실패시 언헬시,초기 20초간 구동 유예
 
 secrets:
   mariadb_app_password:
