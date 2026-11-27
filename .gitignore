@@ -211,3 +211,4 @@ application-local.*
 tailscale.state
 tailscaled.state
 
+url-shortener.code-workspace
